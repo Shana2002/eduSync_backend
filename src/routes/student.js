@@ -1,5 +1,5 @@
 import express from 'express'
-import {createStudent,addnewstudenttoBatch} from '../controllers/student.js'
+import {createStudent,addnewstudenttoBatch,student_details,changeBatch} from '../controllers/student.js'
 
 const router = express.Router()
 
@@ -12,9 +12,11 @@ router.post('/add',createStudent)
 router.post('/add-new-batch',addnewstudenttoBatch)
 
 // change student batch
-router.get('/:id/:name',)
+router.get('/:id',student_details)
 // // update details
 // router.patch()
 
+router.patch('/change-batch',changeBatch)
+// {"id":1 , "batch":5 , "old_batch":1}
 
 export default router

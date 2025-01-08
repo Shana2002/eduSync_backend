@@ -81,11 +81,34 @@ export const addnewstudenttoBatch = (req,res)=>{
 }
 
 export const student_details = (req,res) =>{
-    checkToken(req,res,'secretkeyAdmin'),(err,userInfo)=>{
+    // const {id , name } = req.params;
+
+    //     res.send(`id is ${id} and ${name}`)
+    checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
         if (err) return res.status(401).json(err.message);
 
-        const [id , name] = req.params;
+        const q = "SELECT * FROM student WHERE student_id = ?"
+        db.query(q,[[req.params.id,]],(err,data)=>{
+            if (err) return res.status(500).json(err);
 
-        res.json(id)
-    }
+            return res.status(200).json(data)
+        })
+        
+    })
 }
+
+export const changeBatch = (req,res) => {
+    checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
+        if (err) return res.status(401).json(err.message);
+
+        const {id , batch , old_batch} = req.body
+
+        const q = "UPDATE student_enroll SET batch_id = ? WHERE student_id = ? AND batch_id = ?";
+        db.query(q,[batch,id,old_batch],(err,data)=>{
+            if (err) return res.status(500).json(err);
+
+            res.status(200).json("Batch Transfer Success");
+        })
+    })
+}
+
