@@ -33,3 +33,19 @@ export const showAllModules = (req,res) => {
         return res.status(200).json(data);
     })
 }
+
+export const module_assign=(req,res)=>{
+    checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
+        if (err) return res.status(400).json(err);
+
+        const {module , batch , lecture} = req.body;
+
+        const q = 'INSERT INTO `module_assign`(`batch_id`, `module_id`, `lecture_id`) VALUES (?)';
+        db.query(q,[[batch,module,lecture]],(err,data)=>{
+            if (err) return res.status(500).json(err);
+
+            return res.status(200).json('Lecture Module Assign Successful');
+        })
+    })
+}
+
