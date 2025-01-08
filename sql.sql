@@ -136,6 +136,46 @@ BEGIN
 END$$
 DELIMITER ;
 
+CREATE TABLE `edusync_db`.`student_enroll` (
+  `student_id` INT NOT NULL,
+  `batch_id` INT NOT NULL,
+  PRIMARY KEY (`student_id`, `batch_id`),
+  INDEX `fk_enroll_batch_idx` (`batch_id` ASC) ,
+  CONSTRAINT `fk_enroll_student`
+    FOREIGN KEY (`student_id`)
+    REFERENCES `edusync_db`.`student` (`student_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_enroll_batch`
+    FOREIGN KEY (`batch_id`)
+    REFERENCES `edusync_db`.`batch` (`batch_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+INSERT INTO `edusync_db`.`student_enroll` (`student_id`, `batch_id`)
+VALUES
+-- Batch 1
+(1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1), (9, 1), (10, 1),
+(11, 1), (12, 1), (13, 1), (14, 1), (15, 1), (16, 1), (17, 1), (18, 1), (19, 1), (20, 1),
+(21, 1), (22, 1), (23, 1), (24, 1), (25, 1), (26, 1), (27, 1), (28, 1), (29, 1), (30, 1),
+(31, 1), (32, 1), (33, 1), (34, 1), (35, 1), (36, 1), (37, 1), (38, 1), (39, 1), (40, 1),
+(41, 1), (42, 1), (43, 1), (44, 1), (45, 1), (46, 1), (47, 1), (48, 1), (49, 1), (50, 1),
+
+-- Batch 2
+(1, 2), (2, 2), (3, 2), (4, 2), (5, 2), (6, 2), (7, 2), (8, 2), (9, 2), (10, 2),
+(11, 2), (12, 2), (13, 2), (14, 2), (15, 2), (16, 2), (17, 2), (18, 2), (19, 2), (20, 2),
+(21, 2), (22, 2), (23, 2), (24, 2), (25, 2), (26, 2), (27, 2), (28, 2), (29, 2), (30, 2),
+(31, 2), (32, 2), (33, 2), (34, 2), (35, 2), (36, 2), (37, 2), (38, 2), (39, 2), (40, 2),
+(41, 2), (42, 2), (43, 2), (44, 2), (45, 2), (46, 2), (47, 2), (48, 2), (49, 2), (50, 2),
+
+-- Add similar rows for batches 3 to 15, following the same pattern.
+
+-- Example for batch 15:
+(1, 15), (2, 15), (3, 15), (4, 15), (5, 15), (6, 15), (7, 15), (8, 15), (9, 15), (10, 15),
+(11, 15), (12, 15), (13, 15), (14, 15), (15, 15), (16, 15), (17, 15), (18, 15), (19, 15), (20, 15),
+(21, 15), (22, 15), (23, 15), (24, 15), (25, 15), (26, 15), (27, 15), (28, 15), (29, 15), (30, 15),
+(31, 15), (32, 15), (33, 15), (34, 15), (35, 15), (36, 15), (37, 15), (38, 15), (39, 15), (40, 15),
+(41, 15), (42, 15), (43, 15), (44, 15), (45, 15), (46, 15), (47, 15), (48, 15), (49, 15), (50, 15);
 
 
 CREATE TABLE `edusync_db`.`module` (
@@ -601,3 +641,33 @@ CREATE TABLE `edusync_db`.`quiz_submission` (
     REFERENCES `edusync_db`.`student` (`student_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
+
+
+
+
+
+
+
+
+
+
+
+-- Querys
+
+select s.email,se.batch_id from student_enroll as se LEFT join student as s on s.student_id = se.student_id where s.email = 'john.smith1@example.com' and se.batch_id = 3
+
+
+SELECT 
+    b.batch_id,
+    p.program_characters,
+    COUNT(se.batch_id) AS student_count
+FROM 
+    batch AS b
+LEFT JOIN 
+    program AS p ON p.program_id = b.program_id
+LEFT JOIN 
+    student_enroll AS se ON se.batch_id = b.batch_id
+WHERE 
+    b.batch_id = 2
+GROUP BY 
+    b.batch_id, p.program_characters;
