@@ -16,3 +16,20 @@ export const createModules = (req,res) =>{
     })
 } 
 
+export const showProgramModule = (req,res) =>{
+    const q = 'SELECT m.title,m.module_char,m.sessions FROM program_module AS pe LEFT JOIN module AS m on m.module_id = pe.module_id  WHERE pe.program_id = ?'
+    db.query(q,[req.body.program_id],(err,data)=>{
+        if (err) return res.status(500).json(err);
+        
+        return res.status(200).json(data);
+    })
+}
+
+export const showAllModules = (req,res) => {
+    const q = 'SELECT * FROM module';
+    db.query(q,[],(err,data)=>{
+        if (err) return res.status(500).json(err);
+
+        return res.status(200).json(data);
+    })
+}
