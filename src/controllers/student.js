@@ -79,3 +79,13 @@ export const addnewstudenttoBatch = (req,res)=>{
         res.status(401).json(userInfo.id);
     })
 }
+
+export const student_details = (req,res) =>{
+    checkToken(req,res,'secretkeyAdmin'),(err,userInfo)=>{
+        if (err) return res.status(401).json(err.message);
+
+        const [id , name] = req.params;
+
+        res.json(id)
+    }
+}

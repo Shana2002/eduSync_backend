@@ -11,6 +11,8 @@ router.post('/add',createStudent)
 // reset password
 router.post('/add-new-batch',addnewstudenttoBatch)
 
+// change student batch
+router.get('/:id/:name',)
 // // update details
 // router.patch()
 
