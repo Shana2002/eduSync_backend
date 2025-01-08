@@ -38,3 +38,23 @@ export const updateProgram = (req,res) =>{
     })
 }
 
+export const addProgramModule = (req,res) =>{
+    checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
+        if (err) return res.status(400).json(err);
+
+        const modules = req.body.modules;
+        const program_id = req.body.program_id
+        if (!modules.length) return res.status(400).json("No modules found");
+
+        modules.forEach(module => {
+            const q = 'INSERT INTO `program_module`(`program_id`, `module_id`) VALUES (?)';
+            db.query(q,[[program_id,modules]],(err,data)=>{
+                if (err) return res.status(500).json(err);
+            })
+        });
+        
+        return res.status(200).json('Program module add done');
+    })
+}
+
+
