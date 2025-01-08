@@ -57,4 +57,12 @@ export const addProgramModule = (req,res) =>{
     })
 }
 
+export const show_programs = (req,res) => {
+    const q = 'SELECT * FROM program';
+    db.query(q,[],(err,data)=>{
+        if (err) return res.status(500).json(err);
+        
+        return res.status(200).json(data);
+    })
+}
 
