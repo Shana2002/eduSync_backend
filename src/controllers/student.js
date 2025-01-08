@@ -1,4 +1,5 @@
 import {db} from '../config/database.js'
+import {checkToken} from '../utils/cookieCheck.js'
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
@@ -6,12 +7,14 @@ export const createStudent = (req,res) =>{
     const token = req.cookies.accessToken;
     if (!token) return res.status(401).json("user not logged");
 
-    jwt.verify(token,"secretkeyAdmin",(err,userInfo)=>{
+    jwt.verify(token,"secretkeySuperAdmin",(err,userInfo)=>{
         if (err) return res.status(403).json("Token is not valid");
-
-        const cheqq = `SELECT s.email,se.batch_id FROM student_enroll AS se 
-                        LEFT JOIN student AS s ON s.student_id = se.student_id 
-                        WEHERE s.email = ? AND se.batch_id = ? `
+        const cheqq = `SELECT 
+                            s.email,se.batch_id FROM student_enroll AS se 
+                        LEFT JOIN 
+                            student AS s ON s.student_id = se.student_id 
+                        WHERE 
+                            s.email = ? AND se.batch_id = ?;`
         db.query(cheqq,[req.body.email,req.body.batch],(err,data)=>{
             if (err) return res.status(500).json(err);
             if (data.length) return res.status(400).json("This student already registerd this batch");
@@ -56,8 +59,9 @@ export const createStudent = (req,res) =>{
                     if (err) return res.status(500).json(err);
                     const student_id = data.insertId;
                     
-                    const q = "INSERT INTO student_enrollINSERT INTO student_enroll(`student_id`, `batch_id`) VALUES (?)";
-                    db.query(q,[student_id,req.body.batch],(err,data)=>{
+                    const q = "INSERT INTO student_enroll(`student_id`, `batch_id`) VALUES (?)";
+                    const batch = req.body.batch
+                    db.query(q,[[student_id,batch]],(err,data)=>{
                         if (err) return res.status(500).json(err);
                         return res.status(200).json("Succuessfull enrolled student");
                     })
@@ -67,3 +71,11 @@ export const createStudent = (req,res) =>{
     })
 }
 
+export const addnewstudenttoBatch = (req,res)=>{
+    checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
+        if (err) return res.status(401).json(err.message);
+
+        
+        res.status(401).json(userInfo.id);
+    })
+}
