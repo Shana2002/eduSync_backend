@@ -42,6 +42,19 @@ export const submitAssigment = (req,res) =>{
     checkToken(req,res,'secretkeyAdmin',(err,userInfo)=>{
         if (err) return res.status(400).json(err.message);
 
-        const q = 'SELECT * FROM `assigment_submission` WHERE 1'
+        const {assignment_id,file} = req.body;
+
+        const q = 'SELECT * FROM assigment AS a WHERE DATE(a.end_date) >= CURDATE() AND a.assigment_id = ?'
+        db.query(q,[assignment_id],(err,data)=>{
+            if (err) return res.status(500).json(err);
+            if (!data.length) return res.status.json('Deadline passeed');
+
+            
+            const q = 'INSERT INTO `assigment_submission`(`assigment_id`, `student_id`, `status`,`file`,) VALUSE (?)';
+            db.query(q,[assignment_id,userInfo.id,file],(err,data)=>{
+                if (err) return res.status(500).json(err);
+                return res.status(200).json("Assigment submission successfull");
+            });
+        })
     })
 }
