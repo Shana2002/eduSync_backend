@@ -58,3 +58,17 @@ export const submitAssigment = (req,res) =>{
         })
     })
 }
+
+export const markAddtoAssigment = (req,res) =>{
+    checkToken(req,res,'secretkeyLecture',(err,userInfo)=>{
+        if (err) return res.status(400).json(err);
+
+        const {status,marks,remark,id} = req.body
+        const q = 'UPDATE `assigment_submission` SET `status`= ? ,`marks_obtain`= ? `remarks`=? WHERE submission_id = ?';
+        db.query(q,[status,marks,remark,id],(err,data)=>{
+            if (err) return res.status(500).json(err);
+
+            return res.status(200).json('Marks Added');
+        });
+    });
+}
