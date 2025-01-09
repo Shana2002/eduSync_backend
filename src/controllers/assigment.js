@@ -28,6 +28,20 @@ export const deadlineIpdate = (req,res) => {
 
         const {deadline , assign_id } = req.body;
 
-        const q = 'UPDATE assigment SET end_date = ? WHERE assigment_id = '
+        const q = 'UPDATE assigment SET end_date = ? WHERE assigment_id = ?'
+        db.query(q,[deadline,assign_id],(err,data)=>{
+            if (err) return req.status(500).json(err);
+
+            return res.status(200).json("Update Successfull");
+        })
+    })
+}
+
+
+export const submitAssigment = (req,res) =>{
+    checkToken(req,res,'secretkeyAdmin',(err,userInfo)=>{
+        if (err) return res.status(400).json(err.message);
+
+        const q = 'SELECT * FROM `assigment_submission` WHERE 1'
     })
 }
