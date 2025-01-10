@@ -1,5 +1,6 @@
 import {db} from '../config/database.js'
 import {checkToken} from '../utils/cookieCheck.js'
+import {checkAvaialabelHalls} from './hall.js'
 
 function checkSessionName(req,callback) {
     const {moduleid,batch_id} =req.body;
@@ -29,13 +30,32 @@ export const addSession = (req,res)=>{
     checkToken(req,res,'secretkeyAdmin',(err,userInfo)=>{
         if (err) return res.status(400).json(err);
 
-        checkSessionName(req,(err,session)=>{
+        checkAvaialabelHalls(req,(err,data)=>{
             if (err) return res.status(400).json(err.message);
 
-            const {moduleid,batch_id,data,start_time,end_time,hall_id} = req.body;
+            const {module_assign_id,shedule_data,start_time , end_time,hall_id} = req.body;
 
-            const q = 'INSERT INTO `session`(`session_id`, `module_asign_id`, `session_name`)';
+            if (!data.includes(hall_id)) return res.status(400).json(`hall no ${hall_id} already booked`);
+            checkSessionName(req,(err,session)=>{
+                if (err) return res.status(400).json(err.message);
+                
+                const session_name = `Session ${session}`;
+                const q = 'INSERT INTO `session`(`module_asign_id`, `session_name`) VALUES (?)';
+                db.query(q,[[module_assign_id,session_name]],(err,data)=>{
+                    if (err) return res.status(500).json(err);
+                    const session_id = data.insertId;
+
+                    const q = 'INSERT INTO `shedule`(`session_id`, `shedule_date`, `star_time`, `end_time`, `hall_id`) VALUES (?)';
+                    db.query(q,[[session_id,shedule_data,start_time,end_time,hall_id]],(err,data)=>{
+                        if (err) return res.status(500).json(err);
+                        return res.status(200).json("Shedule add successfull");
+                    })
+                })
+
+            })
         })
+
+        
         
 
     })
