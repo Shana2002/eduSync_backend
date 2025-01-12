@@ -3,6 +3,7 @@ import auth from './routes/auth.js'
 import lecture from './routes/lecture.js'
 import cookieParser from 'cookie-parser'
 import student from './routes/student.js'
+import program from './routes/program.js'
 import test from './routes/test.js'
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(cookieParser())
 app.use("/v1/auth",auth)
 app.use("/v1/lecture",lecture)
 app.use("/v1/student",student)
+app.use("/v1/program",program)
 app.use("/v1/test",test)
 
 app.get('/', (req,res)=>{
