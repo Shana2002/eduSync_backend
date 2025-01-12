@@ -22,3 +22,20 @@ export const markdeCount = (req,res) => {
         })
     })
 }
+
+// manuel mark student
+export const manuelMark = (req,res) =>{
+    checkToken(req,res,'secretkeyLecture',(err,userInfo)=>{
+        if (err) return res.status(400).json(err);
+
+        const {session,student} = req.params;
+        const {remarks} = req.body;
+        const q = 'INSERT INTO `student_attendance`(`student_id`, `session_id`, `marks_as`, `remarks`) VALUES (?)';
+        db.query(q,[[student,session,'manuel',remarks]],(err,data)=>{
+            if (err) return res.status(500).json(err);
+
+            return res.status(200).json("Maneul mark done");
+        })
+    })
+}
+

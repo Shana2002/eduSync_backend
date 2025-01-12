@@ -94,7 +94,7 @@ export const loginStudent = (req,res)=>{
         
         //  assign to token when user is right
 
-        const token = jwt.sign({id: data[0].userid},"secretkeyLecture");
+        const token = jwt.sign({id: data[0].userid},"secretkey");
         // return without password
         const {password, ...others} = data[0];
         // assign cookie
