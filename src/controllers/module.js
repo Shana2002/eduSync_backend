@@ -2,10 +2,11 @@ import {db} from '../config/database.js'
 import { checkToken} from '../utils/cookieCheck.js'
 
 export const createModules = (req,res) =>{
-    checkToken(res,req,'secretkeySuperAdmin',(err,userInfo)=>{
+    // check token
+    checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
         if (err) return res.status(400).json(err.message);
 
-        const {title,module_char,sessions} = req.body;
+        const {title,module_char,sessions} = req.body ?? res.status(400).json("error");
 
         const q = "INSERT INTO `module`(`title`, `module_char`, `sessions`) VALUES (?)";
         db.query(q,[[title,module_char,sessions]],(err,data)=>{
@@ -17,8 +18,9 @@ export const createModules = (req,res) =>{
 } 
 
 export const showProgramModule = (req,res) =>{
+    const {program} = req.params
     const q = 'SELECT m.title,m.module_char,m.sessions FROM program_module AS pe LEFT JOIN module AS m on m.module_id = pe.module_id  WHERE pe.program_id = ?'
-    db.query(q,[req.body.program_id],(err,data)=>{
+    db.query(q,[program],(err,data)=>{
         if (err) return res.status(500).json(err);
         
         return res.status(200).json(data);
