@@ -1,4 +1,4 @@
-import {createModules, showAllModules, showProgramModule} from '../controllers/module.js'
+import {createModules, module_assign, showAllModules, showProgramModule} from '../controllers/module.js'
 import express from 'express'
 
 const router = express.Router();
@@ -12,5 +12,8 @@ router.get("/:program",showProgramModule)
 // create modules
 router.post("/create",createModules)
 // {"title":"Acedemic 1","module_char":"Ac1","sessions":10}
+
+router.post("/assign",module_assign)
+// {"module": , "batch": , "lecture":}
 
 export default router

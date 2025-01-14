@@ -42,12 +42,27 @@ export const module_assign=(req,res)=>{
 
         const {module , batch , lecture} = req.body;
 
-        const q = 'INSERT INTO `module_assign`(`batch_id`, `module_id`, `lecture_id`) VALUES (?)';
-        db.query(q,[[batch,module,lecture]],(err,data)=>{
-            if (err) return res.status(500).json(err);
+        if (!module) return res.status(400).json("Module required");
+        if (!batch) return res.status(400).json("Batch id required");
+        if (!lecture) return res.status(400).json("Lecture id required");
 
-            return res.status(200).json('Lecture Module Assign Successful');
-        })
+        const checkq = `SELECT * FROM batch AS b 
+                        LEFT JOIN 
+                            program_module AS pm ON pm.program_id = b.program_id 
+                        WHERE 
+                            b.batch_id = ? AND pm.module_id = ?`;
+        
+        db.query(checkq,[batch,module],(err,data)=>{
+            if (err) return res.status(500).json(err);
+            if (!data.length) return res.status(400).json("Invalid module");
+
+            const q = 'INSERT INTO `module_assign`(`batch_id`, `module_id`, `lecture_id`) VALUES (?)';
+            db.query(q,[[batch,module,lecture]],(err,data)=>{
+                if (err) return res.status(500).json(err);
+
+                return res.status(200).json('Lecture Module Assign Successful');
+            })
+        })    
     })
 }
 
