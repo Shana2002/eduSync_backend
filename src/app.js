@@ -18,9 +18,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors({
-  origin: '*',  // Replace with your frontend URL
-  credentials: true,  // Allow cookies to be sent
-  allowedHeaders: ['Content-Type', 'Authorization'] // Add other headers as necessary
+  origin: 'http://localhost:5500', 
+  credentials: true,  
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Routes
