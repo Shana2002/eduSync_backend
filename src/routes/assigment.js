@@ -1,5 +1,5 @@
 import express from 'express'
-import {createAssigment, deadlineUpdate, markAddtoAssigment, submitAssigment} from '../controllers/assigment.js'
+import {batchAssigments, createAssigment, deadlineUpdate, markAddtoAssigment, submitAssigment} from '../controllers/assigment.js'
 
 const router = express.Router();
 
@@ -16,7 +16,9 @@ router.post("/submit/:id",submitAssigment);
 // {"file":}
 
 // marking assigment - lecture
-router.patch("mark/:id",markAddtoAssigment);
+router.patch("/mark/:id",markAddtoAssigment);
 // {"marks":,"remark":}
+
+router.get('/batch/:id',batchAssigments)
 
 export default router;

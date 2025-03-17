@@ -93,3 +93,21 @@ export const markAddtoAssigment = (req,res) =>{
         });
     });
 }
+
+export const batchAssigments = (req,res) =>{
+    // checkToken(req,res,'secretkeyLecture',(err,userInfo)=>{
+        // if (err) return res.status(400).json(err);
+
+        const id = req.params.id;
+
+        const q = `SELECT * FROM assigment AS a 
+                    LEFT JOIN module_assign AS ma ON ma.module_assign_id = a.module_assign_id
+                    LEFT JOIN module AS m ON m.module_id = ma.module_id
+                    WHERE ma.batch_id=?`;
+        db.query(q,[id],(err,data)=>{
+            if (err) return res.status(500).json(err);
+
+            return res.status(200).json(data);
+        });
+    // });
+}

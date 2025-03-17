@@ -671,3 +671,40 @@ WHERE
     b.batch_id = 2
 GROUP BY 
     b.batch_id, p.program_characters;
+
+
+
+CREATE TABLE `edusync_db`.`qr_usage` (
+  `qr_id` INT NOT NULL AUTO_INCREMENT,
+  `code` VARCHAR(30) NOT NULL,
+  `session_id` INT NOT NULL,
+  `status` VARCHAR(45) NOT NULL,
+  `create_at_date` DATE NOT NULL,
+  `create_at_time` TIME NOT NULL,
+  `remarks` VARCHAR(100) NULL,
+  PRIMARY KEY (`qr_id`),
+  UNIQUE INDEX `constarined_session_code` (`code` ASC, `session_id` ASC) ,
+  INDEX `fk_qr_session_idx` (`session_id` ASC) ,
+  CONSTRAINT `fk_qr_session`
+    FOREIGN KEY (`session_id`)
+    REFERENCES `edusync_db`.`session` (`session_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+
+
+delimiter $$
+
+CREATE TABLE `qr_usage` (
+  `qr_id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(30) NOT NULL,
+  `session_id` int(11) NOT NULL,
+  `status` enum('active','deactive','canceled') NOT NULL DEFAULT 'active',
+  `create_at_date` date NOT NULL DEFAULT curdate(),
+  `create_at_time` time NOT NULL DEFAULT curtime(),
+  `remarks` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`qr_id`),
+  UNIQUE KEY `constarined_session_code` (`code`,`session_id`),
+  KEY `fk_qr_session_idx` (`session_id`),
+  CONSTRAINT `fk_qr_session` FOREIGN KEY (`session_id`) REFERENCES `session` (`session_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci$$
+

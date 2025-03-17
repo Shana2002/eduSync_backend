@@ -112,3 +112,19 @@ export const changeBatch = (req,res) => {
     })
 }
 
+export const students_details = (req,res) =>{
+    // const {id , name } = req.params;
+
+    //     res.send(`id is ${id} and ${name}`)
+    // checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
+        // if (err) return res.status(401).json(err.message);
+
+        const q = "SELECT * FROM student "
+        db.query(q,[[req.params.id,]],(err,data)=>{
+            if (err) return res.status(500).json(err);
+
+            return res.status(200).json(data)
+        })
+        
+    // })
+}

@@ -81,3 +81,19 @@ export const addSession = (req, res) => {
     });
   });
 };
+
+
+export const getSessions = (req, res) =>{
+  const date = req.params.date;
+
+  const q = `SELECT * FROM shedule AS sh 
+              LEFT JOIN session AS s ON s.session_id = sh.session_id
+              LEFT JOIN module_assign AS ma ON ma.module_assign_id = s.module_asign_id
+              LEFT JOIN module AS m ON m.module_id = ma.module_id
+              WHERE sh.shedule_date = ?`;
+        db.query(q,[date],(err,data)=>{
+            if (err) return res.status(500).json(err);
+
+            return res.status(200).json(data);
+        })
+}

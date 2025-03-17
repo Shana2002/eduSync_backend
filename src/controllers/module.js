@@ -3,8 +3,8 @@ import { checkToken} from '../utils/cookieCheck.js'
 
 export const createModules = (req,res) =>{
     // check token
-    checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
-        if (err) return res.status(400).json(err.message);
+    // /checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
+        // if (err) return res.status(400).json(err.message);
 
         const {title,module_char,sessions} = req.body ?? res.status(400).json("error");
 
@@ -14,7 +14,7 @@ export const createModules = (req,res) =>{
 
             return res.status(200).json("Module add Success");
         })
-    })
+    // })
 } 
 
 export const showProgramModule = (req,res) =>{

@@ -1,11 +1,11 @@
 import express from 'express'
-import { addSession } from '../controllers/session.js'
+import { addSession, getSessions } from '../controllers/session.js'
 
 const router = express.Router();
 
 // create session assigent admin 
-router.use("/create",addSession);
+router.post("/create",addSession);
 
-
+router.get('/:date',getSessions)
 
 export default router;
