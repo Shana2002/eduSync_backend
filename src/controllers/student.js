@@ -85,8 +85,8 @@ export const student_details = (req,res) =>{
     // const {id , name } = req.params;
 
     //     res.send(`id is ${id} and ${name}`)
-    checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
-        if (err) return res.status(401).json(err.message);
+    // checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
+        // if (err) return res.status(401).json(err.message);
 
         const q = "SELECT * FROM student WHERE student_id = ?"
         db.query(q,[[req.params.id,]],(err,data)=>{
@@ -95,7 +95,7 @@ export const student_details = (req,res) =>{
             return res.status(200).json(data)
         })
         
-    })
+    // })
 }
 
 export const changeBatch = (req,res) => {
