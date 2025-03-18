@@ -19,7 +19,7 @@ export const createModules = (req,res) =>{
 
 export const showProgramModule = (req,res) =>{
     const {program} = req.params
-    const q = 'SELECT m.title,m.module_char,m.sessions FROM program_module AS pe LEFT JOIN module AS m on m.module_id = pe.module_id  WHERE pe.program_id = ?'
+    const q = 'SELECT m.module_id,m.title,m.module_char,m.sessions FROM program_module AS pe LEFT JOIN module AS m on m.module_id = pe.module_id  WHERE pe.program_id = ?'
     db.query(q,[program],(err,data)=>{
         if (err) return res.status(500).json(err);
         

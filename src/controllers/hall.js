@@ -35,3 +35,13 @@ export const checkAvailableHall=(req,res)=>{
         })
     })
 }
+
+export const allHalls = (req,res) =>{
+    console.log('hellow')
+    const q = `SELECT * FROM hall`;
+    db.query(q,[],(err,data)=>{
+        if (err) return res.status(500).json(err);
+        
+        return res.status(200).json(data);
+    })
+}

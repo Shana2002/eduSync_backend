@@ -9,6 +9,7 @@ import test from './routes/test.js'
 import assigment from './routes/assigment.js'
 import batch from './routes/batch.js'
 import session from './routes/session.js'
+import hall from './routes/hall.js'
 import cors from 'cors'
 
 const app = express();
@@ -33,6 +34,7 @@ app.use("/v1/test",test)
 app.use("/v1/assigment",assigment)
 app.use("/v1/batch",batch)
 app.use("/v1/session",session)
+app.use("/v1/hall",hall)
 
 
 app.get('/', (req,res)=>{

@@ -97,3 +97,24 @@ export const getSessions = (req, res) =>{
             return res.status(200).json(data);
         })
 }
+
+export const getSessionName = (req,res)=>{
+    const {module , batch} = req.query;
+
+    if (!module || !batch) return res.status(400).json({ message: "Missing required parameters: name and age" });
+    console.log(`${module} and ${batch}`);
+    const q = `SELECT * FROM module_assign AS ma
+                  LEFT JOIN session AS s ON s.module_asign_id = ma.module_assign_id
+                  WHERE ma.batch_id =? AND ma.module_id=?`
+
+    db.query(q,[batch,module],(err,data)=>{
+      if (err) return res.status(500).json(err);
+
+      if(!data || data.length ===0){
+        return res.status(200).json({session:"Session 1"});
+      }
+      else{
+      return res.status(200).json({session:`Session ${data.length+1}`});
+      }
+    })
+}
