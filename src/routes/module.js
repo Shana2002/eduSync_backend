@@ -1,10 +1,12 @@
-import {createModules, module_assign, showAllModules, showProgramModule} from '../controllers/module.js'
+import {createModules, getBatchLectureModules, module_assign, showAllModules, showProgramModule} from '../controllers/module.js'
 import express from 'express'
 
 const router = express.Router();
 
 // show all modules
 router.get("/",showAllModules)
+
+router.get('/lecture/:id',getBatchLectureModules)
 
 // show program modules
 router.get("/:program",showProgramModule)

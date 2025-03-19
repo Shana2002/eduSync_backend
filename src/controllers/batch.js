@@ -29,6 +29,26 @@ export const viewBatchs = (req, res) => {
   // })
 };
 
+export const getBatchLecture = (req, res) =>{
+    checkToken(req,res,'secretkeyLecture',(err,userInfo)=>{
+      if(err) return res.status(500).json(err.message)
+      const {date} = req.params;
+  
+        const q = `SELECT *
+                    FROM module_assign ma
+                    LEFT JOIN batch AS b ON b.batch_id = ma.batch_id
+                    LEFT JOIN program AS p ON p.program_id = b.program_id
+                    WHERE ma.lecture_id =?
+
+                    GROUP by ma.batch_id`;
+          db.query(q,[userInfo.id],(err,data)=>{
+              if (err) return res.status(500).json(err);
+  
+              return res.status(200).json(data);
+          })
+    })
+  }
+
 export const viewBatch = (req, res) => {
   // checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
   const { id } = req.params;

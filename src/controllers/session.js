@@ -189,3 +189,28 @@ export const getSessionName = (req,res)=>{
       }
     })
 }
+
+export const getCurrentSession = (req, res) =>{
+  checkToken(req,res,'secretkeyLecture',(err,userInfo)=>{
+    if(err) return res.status(500).json(err.message)
+
+  const q = `SELECT *,p.title AS program FROM 
+                session AS s 
+            LEFT JOIN 
+                shedule AS sh ON sh.session_id = s.session_id
+            LEFT JOIN 
+              module_assign AS ma ON ma.module_assign_id = s.module_asign_id
+              LEFT JOIN batch b ON b.batch_id = ma.batch_id
+              LEFT JOIN program p ON p.program_id = b.program_id
+              LEFT JOIN module m ON m.module_id = ma.module_id
+            WHERE 
+              ma.lecture_id = 8 AND
+                sh.shedule_date = CURRENT_DATE AND 
+                (sh.star_time <= CURRENT_TIME AND sh.end_time > CURRENT_TIME)`;
+        db.query(q,[userInfo.id],(err,data)=>{
+            if (err) return res.status(500).json(err);
+
+            return res.status(200).json(data);
+        })
+  })
+}

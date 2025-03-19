@@ -1,53 +1,70 @@
 import {db} from '../config/database.js'
 import {checkToken} from '../utils/cookieCheck.js'
 
-export const generateAttendanceQR = (req,res) =>{
-    // check token beacuse qr code can generate only lecture
-    checkToken(req,res,'secretkeyLecture',(err,userInfo)=>{
-        if (err) return res.status(400).json(err.message);
+export const generateAttendanceQR = async (req, res) => {
+    try {
+        // Check token, only lectures can generate QR codes
+        checkToken(req, res, 'secretkeyLecture', async (err, userInfo) => {
+            if (err) return res.status(400).json(err.message);
 
-        // basic required fields
-        const {session_id,qr_id,remarks} = req.body;
-        // checking qr issuing time is correct
-        const check_time = `SELECT * FROM 
-                                session AS s 
-                            LEFT JOIN 
-                                shedule AS sh ON sh.session_id = s.session_id 
-                            WHERE
-                                s.session_id = ? AND 
-                                sh.shedule_date = CURRENT_DATE AND 
-                                (sh.star_time <= CURRENT_TIME AND sh.end_time > CURRENT_TIME)`;
-        db.query(check_time,[session_id],(err,data)=>{
-            if (err) return res.status(500).json(err);
-            if (!data.length) return res.status(400).json("Session is expired or not stared yet");
-        })
+            const { session_id, qr_id, remarks } = req.body;
 
-        // this is for the regenrate qr code 
-        if (qr_id){
-            const del_query = 'DELETE FROM student_attendance WHERE session_id = ?'
-            db.query(del_query,[session_id],(err,data)=>{
+            // Query to check session timing
+            const check_time = `SELECT * FROM 
+                                    session AS s 
+                                LEFT JOIN 
+                                    shedule AS sh ON sh.session_id = s.session_id 
+                                WHERE
+                                    s.session_id = ? AND 
+                                    sh.shedule_date = CURRENT_DATE AND 
+                                    (sh.star_time <= CURRENT_TIME AND sh.end_time > CURRENT_TIME)`;
+
+            db.query(check_time, [session_id], async (err, data) => {
                 if (err) return res.status(500).json(err);
+                if (!data.length) return res.status(400).json("Session is expired or not started yet");
 
-                const update_qr = "UPDATE qr_usage SET status = 'canceled' remarks = ? WHERE code = ?";
-                db.query(update_qr,[remarks,qr_id],(err,data)=>{
-                    if (err) return res.status(500).json(err);
-                })
-            })
-        }
+                try {
+                    // If regenerating a QR code, delete previous records
+                    if (qr_id) {
+                        await new Promise((resolve, reject) => {
+                            db.query('DELETE FROM student_attendance WHERE session_id = ?', [session_id], (err) => {
+                                if (err) return reject(err);
+                                resolve();
+                            });
+                        });
 
-        // generate random qr number combined with session id
-        const random_number = Math.floor(Math.random()*1000000)
-        const gen_qr =  `${random_number}SESSION${session_id}`;
+                        await new Promise((resolve, reject) => {
+                            db.query("UPDATE qr_usage SET status = 'canceled', remarks = ? WHERE code = ?", [remarks, qr_id], (err) => {
+                                if (err) return reject(err);
+                                resolve();
+                            });
+                        });
+                    }
 
-        // insert qr to db and returen qr id
-        const q = 'INSERT INTO `qr_usage`(`code`, `session_id`,) VALUES (?)';
-        db.query(q[[gen_qr,session_id]],(err,data)=>{
-            if (err) return res.status(500).json(err);
+                    // Generate random QR code with session ID
+                    const random_number = Math.floor(Math.random() * 1000000);
+                    const gen_qr = `${random_number}SESSION${session_id}`;
 
-            return res.status(200).json({qr:gen_qr});
-        })
-    })
-}
+                    // Insert the QR code into the database
+                    const insert_qr_query = 'INSERT INTO `qr_usage`(`code`, `session_id`) VALUES (?, ?)';
+                    db.query(insert_qr_query, [gen_qr, session_id], (err, result) => {
+                        if (err) return res.status(500).json(err);
+
+                        // Send QR code in response
+                        return res.status(200).json({ qr: gen_qr });
+                    });
+
+                } catch (error) {
+                    return res.status(500).json(error);
+                }
+            });
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json("Internal Server Error");
+    }
+};
+
 
 // marking attendace using qr
 export const markattendacebtQr = (req,res) =>{

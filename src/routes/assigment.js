@@ -1,8 +1,9 @@
 import express from 'express'
-import {batchAssigments, createAssigment, deadlineUpdate, markAddtoAssigment, submitAssigment} from '../controllers/assigment.js'
+import {batchAssigments, createAssigment, deadlineUpdate, getLectureModuleAssigment, markAddtoAssigment, submitAssigment} from '../controllers/assigment.js'
 
 const router = express.Router();
 
+router.get('/lecture/:id',getLectureModuleAssigment)
 // create assigment
 router.post('/create',createAssigment)
 // {"module_assign_id": , "assigment_type": , "start_date": , "end_date": ,"marks": , "resource": }

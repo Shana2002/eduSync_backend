@@ -111,3 +111,25 @@ export const batchAssigments = (req,res) =>{
         });
     // });
 }
+
+export const getLectureModuleAssigment = (req, res) =>{
+    try {
+        checkToken(req,res,'secretkeyLecture',(err,userInfo)=>{
+            if(err) return res.status(500).json(err.message)
+            const {id} = req.params;
+        
+              const q = `SELECT * FROM assigment a
+                        LEFT JOIN assigment_submission AS asm ON asm.assigment_id = a.assigment_id
+                        LEFT JOIN student AS s ON s.student_id = asm.student_id
+                        WHERE  a.module_assign_id = ?
+                          `;
+                db.query(q,[id],(err,data)=>{
+                    if (err) return res.status(500).json(err);
+        
+                    return res.status(200).json(data);
+                })
+          })
+    } catch (error) {
+        console.log(error);
+    }
+}

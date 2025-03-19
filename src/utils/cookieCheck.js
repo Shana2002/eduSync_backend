@@ -9,7 +9,6 @@ export function checkCookies(token,type){
 
 export function checkToken(req,res,type,callback){
     const token = req.cookies.accessToken;
-    console.log(token);
     if (!token) {
         return callback(new Error('User not fount'));
     }

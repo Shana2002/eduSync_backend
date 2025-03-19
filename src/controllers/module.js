@@ -27,6 +27,28 @@ export const showProgramModule = (req,res) =>{
     })
 }
 
+export const getBatchLectureModules = (req, res) =>{
+    try {
+        checkToken(req,res,'secretkeyLecture',(err,userInfo)=>{
+            if(err) return res.status(500).json(err.message)
+            const {id} = req.params;
+        
+              const q = `SELECT *
+                          FROM module_assign ma
+                          LEFT JOIN module AS m ON m.module_id = ma.module_id
+                          WHERE ma.lecture_id = ? AND ma.batch_id = ? 
+                          `;
+                db.query(q,[userInfo.id,id],(err,data)=>{
+                    if (err) return res.status(500).json(err);
+        
+                    return res.status(200).json(data);
+                })
+          })
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export const showAllModules = (req,res) => {
     const q = 'SELECT * FROM module';
     db.query(q,[],(err,data)=>{

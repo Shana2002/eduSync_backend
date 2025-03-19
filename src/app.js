@@ -10,6 +10,7 @@ import assigment from './routes/assigment.js'
 import batch from './routes/batch.js'
 import session from './routes/session.js'
 import hall from './routes/hall.js'
+import attandance from './routes/attendance.js'
 import cors from 'cors'
 
 const app = express();
@@ -35,11 +36,13 @@ app.use("/v1/assigment",assigment)
 app.use("/v1/batch",batch)
 app.use("/v1/session",session)
 app.use("/v1/hall",hall)
+app.use("/v1/attandance",attandance)
 
 
 app.get('/', (req,res)=>{
     res.send("hello world1")
 });
+
 
 
 
