@@ -16,21 +16,21 @@ export const logingAdmin = (req,res)=>{
         const checkPassword = bcrypt.compareSync(req.body.password,data[0].password);
         if(!checkPassword) return res.clearCookie('accessToken').status(400).json("Wrong password or username!");
         
-        if(data[0].is_super_admin === 1){
-            // is super admin
-            const token = jwt.sign({id: data[0].id},"secretkeySuperAdmin");
-            // return without password
-            const {password, ...others} = data[0];
-            // assign cookie
-            let thirtyDays = 1000 * 60 * 60 * 24 * 30;
+        // if(data[0].is_super_admin === 1){
+        //     // is super admin
+        //     const token = jwt.sign({id: data[0].id},"secretkeySuperAdmin");
+        //     // return without password
+        //     const {password, ...others} = data[0];
+        //     // assign cookie
+        //     let thirtyDays = 1000 * 60 * 60 * 24 * 30;
             
-            return res.cookie("accessToken",token,{
-                maxAge: thirtyDays,
-                secure:true,
-                httpOnly: true,
-                sameSite:"None",
-            }).status(200).json(others);
-        }
+        //     return res.cookie("accessToken",token,{
+        //         maxAge: thirtyDays,
+        //         secure:true,
+        //         httpOnly: true,
+        //         sameSite:"None",
+        //     }).status(200).json(others);
+        // }
 
         //  assign to token when user is right
         const token = jwt.sign({id: data[0].id},"secretkeyAdmin");

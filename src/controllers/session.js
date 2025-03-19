@@ -98,6 +98,21 @@ export const getSessions = (req, res) =>{
         })
 }
 
+export const getSessionsLectrue = (req, res) =>{
+  const {id,date} = req.params;
+
+  const q = `SELECT * FROM shedule AS sh 
+              LEFT JOIN session AS s ON s.session_id = sh.session_id
+              LEFT JOIN module_assign AS ma ON ma.module_assign_id = s.module_asign_id
+              LEFT JOIN module AS m ON m.module_id = ma.module_id
+              WHERE sh.shedule_date = ? AND ma.lecture_id = ?`;
+        db.query(q,[date,id],(err,data)=>{
+            if (err) return res.status(500).json(err);
+
+            return res.status(200).json(data);
+        })
+}
+
 export const getSessionName = (req,res)=>{
     const {module , batch} = req.query;
 

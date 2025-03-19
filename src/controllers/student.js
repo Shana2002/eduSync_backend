@@ -144,7 +144,6 @@ const queryPromise = (query, params) => {
   
   export const studentModuleDetails = async (req, res) => {
     try {
-      console.log('hello');
       const id = req.params.id;
       let result = [];
   

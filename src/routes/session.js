@@ -3,11 +3,15 @@ import { addSession, getSessionName, getSessions } from '../controllers/session.
 
 const router = express.Router();
 
-router.get('/gen',getSessionName)
+router.get('/gen',getSessionName);
 // create session assigent admin 
 router.post("/create",addSession);
 
-router.get('/:date',getSessions)
+// Lecture Session 
+router.post('/lecture/:id/session/:date');
+
+router.get('/:date',getSessions);
+
 
 
 
