@@ -37,7 +37,7 @@ export const showAllModules = (req,res) => {
 }
 
 export const module_assign=(req,res)=>{
-    checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
+    checkToken(req,res,'secretkeyAdmin',(err,userInfo)=>{
         if (err) return res.status(400).json(err);
 
         const {module , batch , lecture} = req.body;

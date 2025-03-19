@@ -2,84 +2,136 @@ import { db } from "../config/database.js";
 import { checkToken } from "../utils/cookieCheck.js";
 import { checkAvaialabelHalls } from "./hall.js";
 import { assignAdmin } from "../utils/assign_admin.js";
+import { module_assign } from "./module.js";
 
 // checking if session available
 function checkSessionName(req, callback) {
   const { moduleid, batch_id } = req.body;
-  var session = 0;
   const q = ` SELECT 
-                        ma.module_assign_id,m.sessions,COUNT(s.session_id) AS current_sessions FROM module_assign AS ma 
-                    LEFT JOIN 
-                        module AS m on m.module_id = ma.module_id
-                    LEFT JOIN 
-                        session AS s on s.module_asign_id = ma.module_assign_id
-                    WHERE 
-                        ma.module_id = ? AND ma.batch_id = ?`;
+                        ma.module_assign_id, m.sessions, COUNT(s.session_id) AS current_sessions 
+                    FROM module_assign AS ma 
+                    LEFT JOIN module AS m ON m.module_id = ma.module_id
+                    LEFT JOIN session AS s ON s.module_asign_id = ma.module_assign_id
+                    WHERE ma.module_id = ? AND ma.batch_id = ?`;
 
   db.query(q, [moduleid, batch_id], (err, data) => {
-    if (err) return callback(new Error(err));
+    if (err) return callback(err); // No need to wrap in `new Error`
 
-    if (data.sessions === current_sessions)
-      return callback(new Error("This module already complete it's sessions"));
-    if (!data.current_sessions) {
-      return callback(null, 1);
-    } else {
-      return callback(null, data.current_sessions + 1);
+    if (data.length === 0) {
+      return callback(null, 1); // No sessions found, start with session 1
     }
+
+    const { sessions, current_sessions } = data[0];
+
+    if (sessions === current_sessions) {
+      return callback(new Error("This module has already completed its sessions"));
+    }
+
+    return callback(null, current_sessions + 1);
   });
 }
-
 export const addSession = (req, res) => {
-  // check admin token
-  checkToken(req, res, "secretkeyAdmin", (err, userInfo) => {
-    if (err) return res.status(400).json(err);
+  try {
+    checkToken(req, res, "secretkeyAdmin", (err, userInfo) => {
+      if (err) return res.status(400).json(err);
 
-    assignAdmin(req, userInfo, (err, data) => {
-      if (err) return res.status(500).json(err.message);
+      checkAvaialabelHalls(req, (err, availableHalls) => {
+        if (err) return res.status(400).json({ message: err.message });
 
-      // checkAvaialabelHalls
-      checkAvaialabelHalls(req, (err, data) => {
-        if (err) return res.status(400).json(err.message);
+        const { module_assign_id, shedule_data, start_time, end_time, hall_id } = req.body;
 
-        const {
-          module_assign_id,
-          shedule_data,
-          start_time,
-          end_time,
-          hall_id,
-        } = req.body;
+        if (!Array.isArray(availableHalls) || !availableHalls.includes(hall_id)) {
+          return res.status(400).json({ message: `Hall no ${hall_id} is already booked` });
+        }
 
-        if (!data.includes(hall_id))
-          return res.status(400).json(`hall no ${hall_id} already booked`);
-
-        // check availabe sessions
         checkSessionName(req, (err, session) => {
-          if (err) return res.status(400).json(err.message);
+          if (err) return res.status(400).json({ message: err.message });
 
-          // session name createing
           const session_name = `Session ${session}`;
-          const q =
-            "INSERT INTO `session`(`module_asign_id`, `session_name`) VALUES (?)";
-          db.query(q, [[module_assign_id, session_name]], (err, data) => {
-            if (err) return res.status(500).json(err);
-            const session_id = data.insertId;
+          const insertSessionQuery = "INSERT INTO `session`(`module_asign_id`, `session_name`) VALUES (?)";
 
-            // creating shedule
-            const q =
+          db.query(insertSessionQuery, [[module_assign_id, session_name]], (err, sessionResult) => {
+            if (err) return res.status(500).json(err);
+            const session_id = sessionResult.insertId;
+
+            const insertSheduleQuery =
               "INSERT INTO `shedule`(`session_id`, `shedule_date`, `star_time`, `end_time`, `hall_id`) VALUES (?)";
+
             db.query(
-              q,
+              insertSheduleQuery,
               [[session_id, shedule_data, start_time, end_time, hall_id]],
-              (err, data) => {
+              (err) => {
                 if (err) return res.status(500).json(err);
-                return res.status(200).json("Shedule add successfull");
+                return res.status(200).json("Schedule added successfully");
               }
             );
           });
         });
       });
     });
-  });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+export const addSession1 = (req, res) => {
+  // check admin token
+  // console.log(req);
+  try {
+    checkToken(req, res, "secretkeyAdmin", (err, userInfo) => {
+      if (err) return res.status(400).json(err);
+  
+      // assignAdmin(req, userInfo, (err, data) => {
+        // if (err) return res.status(500).json(err.message);
+  
+        // checkAvaialabelHalls
+        checkAvaialabelHalls(req, (err, data) => {
+          if (err) return res.status(400).json(err.message);
+  
+          const {
+            module_assign_id,
+            shedule_data,
+            start_time,
+            end_time,
+            hall_id,
+          } = req.body;
+  
+          if (!data.includes(hall_id))
+            return res.status(400).json({message:`hall no ${hall_id} already booked`});
+  
+          // check availabe sessions
+          checkSessionName(req, (err, session) => {
+            if (err) return res.status(400).json({message:err.message});
+  
+            // session name createing
+            const session_name = `Session ${session}`;
+            const q =
+              "INSERT INTO `session`(`module_asign_id`, `session_name`) VALUES (?)";
+            db.query(q, [[module_assign_id, session_name]], (err, data) => {
+              if (err) return res.status(500).json(err);
+              const session_id = data.insertId;
+  
+              // creating shedule
+              const q =
+                "INSERT INTO `shedule`(`session_id`, `shedule_date`, `star_time`, `end_time`, `hall_id`) VALUES (?)";
+              db.query(
+                q,
+                [[session_id, shedule_data, start_time, end_time, hall_id]],
+                (err, data) => {
+                  if (err) return res.status(500).json(err);
+                  return res.status(200).json("Shedule add successfull");
+                }
+              );
+            });
+          });
+        });
+      // });
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 
@@ -99,18 +151,21 @@ export const getSessions = (req, res) =>{
 }
 
 export const getSessionsLectrue = (req, res) =>{
-  const {id,date} = req.params;
+  checkToken(req,res,'secretkeyLecture',(err,userInfo)=>{
+    if(err) return res.status(500).json(err.message)
+    const {date} = req.params;
 
   const q = `SELECT * FROM shedule AS sh 
               LEFT JOIN session AS s ON s.session_id = sh.session_id
               LEFT JOIN module_assign AS ma ON ma.module_assign_id = s.module_asign_id
               LEFT JOIN module AS m ON m.module_id = ma.module_id
               WHERE sh.shedule_date = ? AND ma.lecture_id = ?`;
-        db.query(q,[date,id],(err,data)=>{
+        db.query(q,[date,userInfo.id],(err,data)=>{
             if (err) return res.status(500).json(err);
 
             return res.status(200).json(data);
         })
+  })
 }
 
 export const getSessionName = (req,res)=>{
@@ -118,18 +173,19 @@ export const getSessionName = (req,res)=>{
 
     if (!module || !batch) return res.status(400).json({ message: "Missing required parameters: name and age" });
     console.log(`${module} and ${batch}`);
-    const q = `SELECT * FROM module_assign AS ma
-                  LEFT JOIN session AS s ON s.module_asign_id = ma.module_assign_id
-                  WHERE ma.batch_id =? AND ma.module_id=?`
+    const q = `SELECT s.*,ma.*,l.first_name,l.last_name FROM module_assign AS ma
+              LEFT JOIN session AS s ON s.module_asign_id = ma.module_assign_id
+              LEFT JOIN lecture AS l ON l.lecture_id = ma.lecture_id
+              WHERE ma.batch_id =? AND ma.module_id=?`
 
     db.query(q,[batch,module],(err,data)=>{
       if (err) return res.status(500).json(err);
 
       if(!data || data.length ===0){
-        return res.status(200).json({session:"Session 1"});
+        return res.status(200).json({session:"Session 1",lecture:null});
       }
       else{
-      return res.status(200).json({session:`Session ${data.length+1}`});
+      return res.status(200).json({session:`Session ${data.length+1}`,lecture:data[0].first_name +` `+data[0].last_name ,module_assign:data[0].module_assign_id});
       }
     })
 }

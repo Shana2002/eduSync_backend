@@ -1,5 +1,5 @@
 import express from 'express'
-import {addLectur , changepassword} from '../controllers/lecture.js'
+import {addLectur , changepassword, getLectures} from '../controllers/lecture.js'
 
 const router = express.Router()
 
@@ -8,6 +8,7 @@ router.post('/add',addLectur) // {"first_name":"hansaka" , "last_name":"ravishan
 
 // change password
 router.post('/change-password',changepassword) // {"password":"hansaka"}
+router.get('/',getLectures) // {"password":"hansaka"}
 
 
 

@@ -60,3 +60,17 @@ export const changepassword = (req,res)=> {
     })
 }
 
+// change password from the lecture
+export const getLectures = (req,res)=> {
+    const token = req.cookies.accessToken;
+    if (!token) return res.status(401).json("Not logged")
+    jwt.verify(token,'secretkeyAdmin',(err,userInfo)=>{
+        if (err) return res.status(403).json("Token is not valid")
+
+        const q = "SELECT l.lecture_id,l.first_name,l.last_name FROM lecture As l";
+        db.query(q,[],(err,data)=>{
+            if (err) return res.status(500).json(err);
+            return res.status(200).json(data);
+        })
+    })
+}

@@ -1,5 +1,5 @@
 import express from 'express'
-import { addSession, getSessionName, getSessions } from '../controllers/session.js'
+import { addSession, getSessionName, getSessions, getSessionsLectrue } from '../controllers/session.js'
 
 const router = express.Router();
 
@@ -8,7 +8,7 @@ router.get('/gen',getSessionName);
 router.post("/create",addSession);
 
 // Lecture Session 
-router.post('/lecture/:id/session/:date');
+router.get('/lecture/session/:date',getSessionsLectrue);
 
 router.get('/:date',getSessions);
 
