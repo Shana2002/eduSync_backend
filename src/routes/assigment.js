@@ -1,9 +1,10 @@
 import express from 'express'
-import {batchAssigments, createAssigment, deadlineUpdate, getLectureModuleAssigment, markAddtoAssigment, submitAssigment} from '../controllers/assigment.js'
+import {getStudentAssigments,batchAssigments, createAssigment, deadlineUpdate, getLectureModuleAssigment, markAddtoAssigment, submitAssigment} from '../controllers/assigment.js'
 
 const router = express.Router();
 
 router.get('/lecture/:id',getLectureModuleAssigment)
+router.get('/student',getStudentAssigments)
 // create assigment
 router.post('/create',createAssigment)
 // {"module_assign_id": , "assigment_type": , "start_date": , "end_date": ,"marks": , "resource": }

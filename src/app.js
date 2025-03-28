@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors({
-  origin: 'http://localhost:5500', 
+  origin: 'http://127.0.0.1:5500', 
   credentials: true,  
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -38,6 +38,8 @@ app.use("/v1/session",session)
 app.use("/v1/hall",hall)
 app.use("/v1/attandance",attandance)
 
+
+app.use('/public', express.static('public'));
 
 app.get('/', (req,res)=>{
     res.send("hello world1")

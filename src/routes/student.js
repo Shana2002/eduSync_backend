@@ -16,10 +16,12 @@ router.get('/:id',student_details)
 // // update details
 // router.patch()
 
+router.get('/:id/modules',studentModuleDetails)
+
 router.patch('/change-batch',changeBatch)
 // {"id":1 , "batch":5 , "old_batch":1}
 router.get('/',students_details)
 
-router.get('/:id/modules',studentModuleDetails)
+
 
 export default router

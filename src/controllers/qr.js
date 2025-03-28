@@ -4,8 +4,8 @@ import {checkToken} from '../utils/cookieCheck.js'
 export const generateAttendanceQR = async (req, res) => {
     try {
         // Check token, only lectures can generate QR codes
-        checkToken(req, res, 'secretkeyLecture', async (err, userInfo) => {
-            if (err) return res.status(400).json(err.message);
+        // checkToken(req, res, 'secretkeyLecture', async (err, userInfo) => {
+            // if (err) return res.status(400).json(err.message);
 
             const { session_id, qr_id, remarks } = req.body;
 
@@ -58,7 +58,7 @@ export const generateAttendanceQR = async (req, res) => {
                     return res.status(500).json(error);
                 }
             });
-        });
+        // });
     } catch (error) {
         console.log(error);
         return res.status(500).json("Internal Server Error");

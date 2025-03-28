@@ -96,7 +96,7 @@ export const loginStudent = (req,res)=>{
         
         //  assign to token when user is right
 
-        const token = jwt.sign({id: data[0].userid},"secretkey");
+        const token = jwt.sign({id: data[0].student_id},"secretkey");
         // return without password
         const {password, ...others} = data[0];
         others['success']=true;
@@ -108,6 +108,9 @@ export const loginStudent = (req,res)=>{
             secure:true,
             httpOnly: true,
             sameSite:"None",
-        }).status(200).json(others);
+        }).status(200).json({
+            ...others,
+            accessToken: token  // Include token in the response
+        });
     })
 }

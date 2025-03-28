@@ -23,7 +23,7 @@ export const viewBatchs = (req, res) => {
     "SELECT * FROM batch AS b LEFT JOIN program AS p ON p.program_id = b.program_id";
   db.query(q, [], (err, data) => {
     if (err) return res.status(500).json(err);
-
+    console.log('moko wenne')
     return res.status(200).json(data);
   });
   // })
