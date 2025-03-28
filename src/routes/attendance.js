@@ -5,7 +5,7 @@ import {manuelMark, markdeCount} from '../controllers/attendace.js'
 const router = express.Router();
 
 // generate qr
-router.get("/generate-qr",generateAttendanceQR)
+router.post("/generate-qr",generateAttendanceQR)
 // {session_id,qr_id,remarks}
 
 // mark attendance qr

@@ -21,5 +21,6 @@ router.patch("/mark/:id",markAddtoAssigment);
 // {"marks":,"remark":}
 
 router.get('/batch/:id',batchAssigments)
+router.get('/batch/student/:id',batchAssigments)
 
 export default router;
