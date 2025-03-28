@@ -61,32 +61,43 @@ export const deadlineUpdate = (req,res) => {
 }
 
 // student assigment submission
-export const submitAssigment = (req,res) =>{
-    // check student token
-    checkToken(req,res,'secretkey',(err,userInfo)=>{
+export const submitAssignment = (req, res) => {
+    // Check the token to verify the student
+    checkToken(req, res, 'secretkey', (err, userInfo) => {
         if (err) return res.status(400).json(err.message);
 
-        // required fileds
         const assignment_id = req.params.id;
-        const {file} = req.body;
 
-        if (!file) return res.status(400).json("File required");
-        
-        // check deadline
-        const q = 'SELECT * FROM assigment AS a WHERE DATE(a.end_date) >= CURDATE() AND a.assigment_id = ?'
-        db.query(q,[assignment_id],(err,data)=>{
-            if (err) return res.status(500).json(err);
-            if (!data.length) return res.status.json('Deadline passeed');
+        // Use Multer to handle the file upload
+        assignmentUpload(req, res, (err) => {
+            if (err) {
+                return res.status(400).json({ message: err.message });
+            }
 
-            // subbmition query
-            const q = 'INSERT INTO `assigment_submission`(`assigment_id`, `student_id`, `status`,`file`,) VALUSE (?)';
-            db.query(q,[assignment_id,userInfo.id,'submitted',file],(err,data)=>{
+            // Check if file is uploaded
+            const file = req.file;
+            if (!file) {
+                return res.status(400).json("File is required");
+            }
+
+            // Check if the deadline for the assignment has passed
+            const q = 'SELECT * FROM assignment AS a WHERE DATE(a.end_date) >= CURDATE() AND a.assignment_id = ?';
+            db.query(q, [assignment_id], (err, data) => {
                 if (err) return res.status(500).json(err);
-                return res.status(200).json("Assigment submission successfull");
+                if (!data.length) return res.status(400).json('Deadline passed');
+
+                // Submit the assignment data into the database
+                const insertQuery = 'INSERT INTO `assignment_submission`(`assignment_id`, `student_id`, `status`, `file`) VALUES (?)';
+                const submissionData = [assignment_id, userInfo.id, 'submitted', file.path];
+
+                db.query(insertQuery, [submissionData], (err, result) => {
+                    if (err) return res.status(500).json(err);
+                    return res.status(200).json("Assignment submitted successfully");
+                });
             });
-        })
-    })
-}
+        });
+    });
+};
 
 // marking assigment marks - lecture
 export const markAddtoAssigment = (req,res) =>{
@@ -161,6 +172,7 @@ export const getStudentAssigments = async(req, res) =>{
                 SELECT * FROM student_enroll se
                 LEFT JOIN batch b ON b.batch_id = se.batch_id
                 LEFT JOIN module_assign ma ON ma.batch_id = b.batch_id
+                LEFT JOIN module m ON m.module_id = ma.module_id
                 LEFT JOIN assigment a On a.module_assign_id = ma.module_assign_id
                 WHERE a.assigment_id is NOT NULL and se.student_id = ?
             `;

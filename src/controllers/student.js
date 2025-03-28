@@ -89,19 +89,24 @@ export const addnewstudenttoBatch = (req,res)=>{
 
 export const student_details = (req,res) =>{
     // const {id , name } = req.params;
-
     //     res.send(`id is ${id} and ${name}`)
-    // checkToken(req,res,'secretkeySuperAdmin',(err,userInfo)=>{
-        // if (err) return res.status(401).json(err.message);
-
+    try {
+      checkToken(req,res,'secretkey',(err,userInfo)=>{
+        console.log(err)
+        if (err) return res.status(401).json(err.message);
+        console.log(`id is a ${userInfo.id}`)
         const q = "SELECT * FROM student WHERE student_id = ?"
-        db.query(q,[[req.params.id,]],(err,data)=>{
+        db.query(q,[userInfo.id],(err,data)=>{
+            console.log(err)
             if (err) return res.status(500).json(err);
-
-            return res.status(200).json(data)
+            console.log(data)
+            return res.status(200).json(data[0])
         })
         
-    // })
+    })
+    } catch (error) {
+      console.log(error);
+    }
 }
 
 export const changeBatch = (req,res) => {
